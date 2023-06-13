@@ -1,27 +1,46 @@
-<header>
-  <h1>Realtime Form</h1>
-</header>
+<div class='chat-root'>
+  <div class='chat-header'>
+    <h1><span class='chit-title'>Chit</span><span class='chat-title'>Chat</span></h1>
+    <h4>Chat To Random Strangers</h4>
+  </div>
 
-<main>
-  <form [formGroup]="form">
-    <fieldset>
-      <label class="form-control">
-        <span>Title: </span>
-        <input formControlName="title" />
-      </label>
+  <div class='chat-section'>
 
-      <label class="form-control">
-        <span>Description: </span>
-        <textarea formControlName="description" rows="5"></textarea>
-      </label>
-    </fieldset>
-  </form>
+    <div class='chat-status-label' [ngSwitch]='clientStatus'>
+      <p *ngSwitchCase='ClientStatus.idle'>Press New to connect to new stranger</p>
+      <p *ngSwitchCase='ClientStatus.waiting' class=''>Please wait while connecting ...</p>
+      <p *ngSwitchCase='ClientStatus.chatting' class='chat-title'>You are connected to some stranger</p>
+      <p *ngSwitchCase='ClientStatus.connect_error' class='text-red'>Couldn't connect to server</p>
+      <p *ngSwitchCase='ClientStatus.disconnect' class='text-red'>disconnected</p>
+    </div>
 
-  <ng-container *ngIf="connectedClients$ | async as clients">
-    <h2>Clients ({{ clients.length }})</h2>
-    <ul>
-      <li *ngFor="let client of clients">{{ client }}</li>
-    </ul>
-  </ng-container>
-</main>
 
+    <div #msgHistoryContainer class='chat-content'>
+      <ng-container  *ngFor='let msg of chatMessages' >
+        <div *ngIf="msg.usrLabel == 'Me'" class='my-msg'>
+         <p class='usr-me'>Me</p>
+          <div>
+            <p>{{msg.msg}}</p>
+          </div>
+        </div>
+
+        <div *ngIf="msg.usrLabel == 'Stranger'" class='stranger-msg'>
+          <p class='usr-stranger'>Stranger</p>
+          <div>
+            <p>{{msg.msg}}</p>
+          </div>
+        </div>
+
+      </ng-container>
+    </div>
+  </div>
+
+  <div class='message-field'>
+   <div class='bottom-nav'>
+     <button (click)='connectToStranger()' mat-raised-button color='primary'>{{clientStatus == ClientStatus.chatting?'Stop' : 'New'}}</button>
+     <textarea matInput [(ngModel)]='clientMsg' placeholder='Type your message here!'></textarea>
+     <button (click)='sendMessage()' [disabled]='clientStatus != ClientStatus.chatting' color='accent' mat-raised-button><mat-icon>send</mat-icon></button>
+   </div>
+  </div>
+
+</div>

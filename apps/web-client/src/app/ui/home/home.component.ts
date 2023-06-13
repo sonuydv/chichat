@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { ChatService } from 'apps/web-client/src/app/core/service/chat.service';
 
 @Component({
   selector: 'realtime-form-home',
@@ -7,9 +9,20 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() { }
+  isAccepted: boolean = false
+
+  constructor(
+    private router: Router,
+    private chatService: ChatService
+  ) { }
 
   ngOnInit() {
   }
+
+  onStartChat(){
+    this.chatService.isAccepted = true
+    this.router.navigateByUrl('chat')
+  }
+
 
 }

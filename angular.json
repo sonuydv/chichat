@@ -14,7 +14,9 @@
             "outputPath": "dist/apps/api",
             "main": "apps/api/src/main.ts",
             "tsConfig": "apps/api/tsconfig.app.json",
-            "assets": ["apps/api/src/assets"]
+            "assets": [
+              "apps/api/src/assets"
+            ]
           },
           "configurations": {
             "production": {
@@ -43,7 +45,10 @@
               "apps/api/tsconfig.app.json",
               "apps/api/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!apps/api/**"]
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/api/**"
+            ]
           }
         },
         "test": {
@@ -79,7 +84,10 @@
               "apps/web-client/src/favicon.ico",
               "apps/web-client/src/assets"
             ],
-            "styles": ["apps/web-client/src/styles.scss"],
+            "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "apps/web-client/src/styles.scss"
+            ],
             "scripts": []
           },
           "configurations": {
@@ -139,7 +147,10 @@
               "apps/web-client/tsconfig.app.json",
               "apps/web-client/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!apps/web-client/**"]
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/web-client/**"
+            ]
           }
         },
         "test": {
@@ -173,8 +184,13 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": ["apps/web-client-e2e/tsconfig.e2e.json"],
-            "exclude": ["**/node_modules/**", "!apps/web-client-e2e/**"]
+            "tsConfig": [
+              "apps/web-client-e2e/tsconfig.e2e.json"
+            ],
+            "exclude": [
+              "**/node_modules/**",
+              "!apps/web-client-e2e/**"
+            ]
           }
         }
       }
@@ -192,7 +208,10 @@
               "libs/data/tsconfig.lib.json",
               "libs/data/tsconfig.spec.json"
             ],
-            "exclude": ["**/node_modules/**", "!libs/data/**"]
+            "exclude": [
+              "**/node_modules/**",
+              "!libs/data/**"
+            ]
           }
         },
         "test": {

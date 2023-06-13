@@ -1,19 +1,125 @@
-form {
-  width: 100%;
+.chat-root{
+  width: 60vw;
+  height: 100vh;
   padding: 0.5rem;
-  max-width: 600px;
+}
 
-  .form-control {
-    display: flex;
-    margin-bottom: 1rem;
+.chat-header{
+  height: 5%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
 
-    & > span {
-      flex-basis: 20%;
-    }
+.chit-title{
+  color: deeppink;
+}
 
-    & > input,
-    & > textarea {
-      flex-grow: 1;
-    }
-  }
+.chat-title{
+  color: mediumpurple;
+}
+
+.chat-header h4{
+  color: gray;
+  font-weight: 500;
+}
+
+
+.chat-section{
+  height: 80%;
+}
+
+.chat-status-label{
+  height: 5%;
+}
+
+.chat-content{
+  height: 95%;
+  overflow: scroll;
+  border: 2px gray solid;
+  border-radius: 6px;
+  padding: 0.5rem;
+  display: flex;
+  gap: 0.2rem;
+  flex-direction: column;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.message-field{
+  height: 10%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.bottom-nav{
+  height: 70px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  gap: 1rem;
+}
+
+.bottom-nav button:first-child{
+  width: 100px;
+}
+
+.bottom-nav textarea{
+  flex-grow: 1;
+  padding: 4px;
+  border-radius: 4px;
+  outline: none;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+}
+
+.bottom-nav button:last-child{
+  width: 150px;
+ margin-left: auto;
+}
+
+.usr-me{
+  color: deeppink;
+  font-size: 0.9rem;
+  margin: 2px;
+}
+
+.usr-stranger{
+  color: mediumpurple;
+  font-size: 0.9rem;
+  margin: 2px;
+}
+
+
+.my-msg{
+ width: 50%;
+}
+
+
+.my-msg div{
+  background: deeppink;
+  padding: 2px 5px;
+  border-radius: 0 20px;
+}
+
+.stranger-msg{
+  width: 50%;
+  align-self: end;
+}
+
+.stranger-msg div{
+  background: mediumpurple;
+  padding: 2px 5px;
+  border-radius: 0 20px;
+}
+
+.chat-msg{
+  font-size: 0.9rem;
+}
+
+
+.text-red{
+  color: red;
 }

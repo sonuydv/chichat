@@ -1,6 +1,12 @@
 <div class='home-root'>
 
-  <h1>Welcome To ChitChat</h1>
-  <h5>ChitChat Lets you connect to random stranger fround around the world</h5>
+  <h1>Welcome To <span class='chit-title'>Chit</span><span class='chat-title'>Chat</span></h1>
+  <h4>ChitChat Lets you connect to random stranger from around the world</h4>
+
+  <div class='start-chat'>
+    <mat-checkbox [checked]='isAccepted' (change)='isAccepted = $event.checked'>I accept terms and conditions</mat-checkbox>
+    <button (click)='onStartChat()' [disabled]='!isAccepted' mat-flat-button color="accent">Chat</button>
+  </div>
+
 </div>
 
