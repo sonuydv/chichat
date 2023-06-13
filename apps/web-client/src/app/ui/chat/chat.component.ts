@@ -1,30 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { BehaviorSubject, merge } from 'rxjs';
-import { scan, map } from 'rxjs/operators';
-import { FormBuilder } from '@angular/forms';
-import { Socket } from 'ngx-socket-io';
-
+import { Action, ClientConnected, Data, Init, ValuePatched } from 'apps/web-client/src/app/core/actions';
+import { map, scan } from 'rxjs/operators';
+import { reducer, State } from 'apps/web-client/src/app/core/state';
 import { ActionTypes, FormData } from '@realtime-form/data';
-import { State, reducer } from './core/state';
-import {
-  ClientConnected,
-  Data,
-  ValuePatched,
-  Action,
-  Init
-} from './core/actions';
-import {
-  getPatchValueEffect,
-  getValuePatchedEffect,
-  getFormChangesEffect
-} from './core/effects';
+import { Socket } from 'ngx-socket-io';
+import { FormBuilder } from '@angular/forms';
+import { getFormChangesEffect, getPatchValueEffect, getValuePatchedEffect } from 'apps/web-client/src/app/core/effects';
 
 @Component({
-  selector: 'realtime-form-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  selector: 'realtime-form-chat',
+  templateUrl: './chat.component.html',
+  styleUrls: ['./chat.component.scss']
 })
-export class AppComponent implements OnInit {
+export class ChatComponent implements OnInit {
+
   private dispatcher = new BehaviorSubject<Action>(new Init());
   actions$ = this.dispatcher.asObservable();
   store$ = this.actions$.pipe(
@@ -66,4 +56,6 @@ export class AppComponent implements OnInit {
       getFormChangesEffect(this.form, this.dispatcher)
     ).subscribe();
   }
+
+
 }

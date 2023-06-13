@@ -2,11 +2,19 @@
 
 ![Visual representation of the end product](https://dev-to-uploads.s3.amazonaws.com/i/ni2wsrw1w23zsr6n6zcj.gif)
 
-In this article I wanted to explore something I've been asked to build several times for different use cases. With distributed and remote teams, real time cooperation is key for success. Whenever we hear about Real Time applications we always see the same example, a Chat. Although chats and cool and important, there's a simpler thing that can help teams maximize cooperation, forms that can be edited by multiple users concurrently.
+In this article I wanted to explore something I've been asked to build several times for different use cases. With distributed and remote teams, 
+real time cooperation is key for success. Whenever we hear about Real Time applications we always see the same example, 
+a Chat. Although chats and cool and important, there's a simpler thing that can help teams maximize cooperation, forms that can be edited by multiple users concurrently.
 
-It seems challenging, and of course, depending on the use case it can be harder and more _expensive_. It can get expensive simply because it means more data being sent back and forward. If your application is running on a VPS or a dedicated server you may be able to do this without any extra expenses, but if you are doing serverless this means more money you'll spend at the end of the month.
+It seems challenging, and of course, depending on the use case it can be harder and more _expensive_. 
+It can get expensive simply because it means more data being sent back and forward. 
+If your application is running on a VPS or a dedicated server you may be able to do this without any extra expenses, 
+but if you are doing serverless this means more money you'll spend at the end of the month.
 
-In a traditional form implementation, every client has its own state and it sends a request only when the form is submitted. In this case, things are more complex, every time a client updates the form, all the other clients should receive this information. If you are planning to use this feature in apps with just a few users, its Okay, but if you are planning to have 1,000 users concurrently changing the form, things dramatically change.
+In a traditional form implementation, every client has its own state and it sends a request only when the form is submitted. 
+In this case, things are more complex, every time a client updates the form, all the other clients should receive this information. 
+If you are planning to use this feature in apps with just a few users, its Okay, 
+but if you are planning to have 1,000 users concurrently changing the form, things dramatically change.
 
 > In this case I'm gonna focus on doing a very simple implementation to get you started, this is by no means a production ready application.
 
@@ -16,9 +24,11 @@ Let's say you have multiple users that have to work together towards a goal, you
 
 ## The Solution
 
-There should be a service responsible for tracking the current state of the task and sending updates to all the connected clients. The Web Client that will be used by the clients, should display the connected clients and a form that can be changed by user interaction or by updates coming from the service.
+There should be a service responsible for tracking the current state of the task and sending updates to all the connected clients. 
+The Web Client that will be used by the clients, should display the connected clients and a form that can be changed by user interaction or by updates coming from the service.
 
-Since there's a big chance of concurrency, we have to choose a strategy that helps us with that. I'm personally a fan of Redux, so I based my implementation on it but adjusted it according to my needs. Since this is a very small app, I used pure RxJs for my state management implementation. The actions that can occur are:
+Since there's a big chance of concurrency, we have to choose a strategy that helps us with that. I'm personally a fan of Redux, 
+so I based my implementation on it but adjusted it according to my needs. Since this is a very small app, I used pure RxJs for my state management implementation. The actions that can occur are:
 
 - Init: It sets the initial state of the web client, its triggered when each client loads.
 - ClientConnected: Everytime a client connects to the service, all the clients receive an updated list of the currently connected clients.
@@ -30,9 +40,14 @@ For this sample the form data is very simple and it only consists of a title and
 
 ## Implementation
 
-First thing is to choose the technologies we want to use. I'm a proud Angular Developer, so I choose to use Angular for the Web Client. Since NestJs is so cool, I decided to use it for the service responsible for synchronization. Finally since the Web Client and the service are going to be communicating in real time, Nx can be really helpful to reduce duplication and ensure the messages passing through are type safe using shared interfaces.
+First thing is to choose the technologies we want to use. I'm a proud Angular Developer, 
+so I choose to use Angular for the Web Client. Since NestJs is so cool, I decided to use it for the service responsible for synchronization. 
+Finally since the Web Client and the service are going to be communicating in real time, Nx can be really helpful to reduce duplication and 
+ensure the messages passing through are type safe using shared interfaces.
 
-> NOTE: For the Web Client you can use any JS framework or even plain Javascript. Same thing with the service, you can use Node or whatever you want as long as you have a Socket.IO implementation. I used Nx just because I like it but you can also skip that part.
+> NOTE: For the Web Client you can use any JS framework or even plain Javascript. 
+> Same thing with the service, you can use Node or whatever you want as long as you have a Socket.IO implementation. 
+> I used Nx just because I like it but you can also skip that part.
 
 We'll start by generating the Nx workspace.
 
@@ -241,7 +256,7 @@ import { AppComponent } from './app.component';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
 const config: SocketIoConfig = {
-  url: 'http://192.168.1.2:3000',
+  url: 'http://localhost:3000',
   options: {}
 };
 
