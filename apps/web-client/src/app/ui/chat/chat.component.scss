@@ -123,3 +123,15 @@
 .text-red{
   color: red;
 }
+
+@media (max-width:801px){
+ .chat-root{
+   width: 100vw;
+ }
+
+
+  .message-field{
+    height: 8%;
+  }
+
+}
