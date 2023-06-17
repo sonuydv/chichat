@@ -1,4 +1,5 @@
 
+/**Client States during chat*/
 export enum UserStatus{
   idle,
   waiting,

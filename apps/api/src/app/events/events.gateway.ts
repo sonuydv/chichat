@@ -8,23 +8,29 @@ import { UserStatus } from 'libs/data/src/model/client.model';
 import { ChatServiceServer } from 'apps/api/src/app/service/chat-service.server';
 import { ChatMessage } from 'libs/data/src/model/chat.model';
 
+/**A class solely responsible for providing real
+ * time communication with for the connected clients */
 @WebSocketGateway()
 export class EventsGateway {
-  // idleClients: UserModel[] = []
+
+  /**List of waiting clients to match with another client*/
   waitingRoomList : UserModel[] = [];
+  /**List of all the connected clients*/
   connectedClientList : string[] = [];
-  // chattingClients: UserModel[] = []
-  chatRoomList: Map<string, string> = new Map<string, string>()
-  data = {};
+
+  /**Web socket server instance*/
   @WebSocketServer()
   server: Server;
+
+  /**Logger class for managing and tracking server actions in real time*/
   private logger: Logger = new Logger('EventsGateway');
 
   constructor(
-    private chatService: ChatServiceServer
   ) {
   }
 
+  /**Handler method which called once a
+   * client tries to connect with the server*/
   handleConnection(client: Socket) {
     this.connectedClientList.push(client.id)
     this.connectToStranger(client)
@@ -39,6 +45,9 @@ export class EventsGateway {
     // client.emit(ActionTypes.Data, this.data);
   }
 
+  /**Handler method called when a client disconnects from the server,
+   * reason could be anything like network issue,browser issue,web app closed etc
+   * */
   handleDisconnect(clientSock: Socket) {
     this.connectedClientList = this.connectedClientList.filter(
       connectedClient => connectedClient !== clientSock.id
@@ -60,7 +69,9 @@ export class EventsGateway {
   // }
 
 
-  /*Connect to new stranger*/
+  /**Handler method called when a client request to join another client
+   * to chat
+   * */
   @SubscribeMessage(ActionTypes.reJoinRoom)
   connectNew(clientSock: Socket){
    this.logger.log(
@@ -71,10 +82,8 @@ export class EventsGateway {
   }
 
 
-
-
+  /**Helper method  logic for connecting clients to one another*/
   connectToStranger(clientSock: Socket){
-
     /*If there is no users in waiting list*/
     if(this.waitingRoomList.length < 1){
       /*add the current use to the waiting list*/
@@ -101,6 +110,7 @@ export class EventsGateway {
     }
   }
 
+  /**Handler method called when connected clients start communicating with each other*/
   @SubscribeMessage(ActionTypes.sendRoomMsg)
   roomMessage(client: Socket, payload: ChatMessage){
     this.logger.log(
@@ -110,6 +120,7 @@ export class EventsGateway {
   }
 
 
+  /**Handler method called when a client leaves a chat in between a conversation*/
   @SubscribeMessage(ActionTypes.leaveRoom)
   leaveRoom(client: Socket, roomId: string){
     try{
@@ -122,6 +133,9 @@ export class EventsGateway {
     }
   }
 
+  /**Handler method when client don't want to be chat to anyone: idle state
+   * then no other client could connect with him
+   * */
   @SubscribeMessage(ActionTypes.userIdle)
   usrIdl(clientSock: Socket){
     /*If use already in waiting list*/

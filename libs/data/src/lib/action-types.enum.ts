@@ -1,3 +1,7 @@
+
+/**Action which are used by both server and client to
+ * exchange information via message passing
+ * */
 export enum ActionTypes {
   Data = '[Socket] Data',
   ClientConnected = '[Socket] Client Connected',

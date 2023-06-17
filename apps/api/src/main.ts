@@ -1,7 +1,10 @@
+
+
 /**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
+ * Server Bootstrap file
+ * to initialized socker.io
+ * server
+ * */
 
 import { NestFactory } from '@nestjs/core';
 
