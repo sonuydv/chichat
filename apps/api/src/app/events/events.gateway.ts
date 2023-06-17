@@ -7,18 +7,20 @@ import { UserModel } from 'apps/api/src/app/model/user.model';
 import { UserStatus } from 'libs/data/src/model/client.model';
 import { ChatServiceServer } from 'apps/api/src/app/service/chat-service.server';
 import { ChatMessage } from 'libs/data/src/model/chat.model';
+import { ChatRoom } from 'apps/api/src/app/model/chats.model';
 
 @WebSocketGateway()
 export class EventsGateway {
-  // idleClients: UserModel[] = []
-  waitingRoomList : UserModel[] = [];
+  // waitingRoomList : UserModel[] = [];
   connectedClientList : string[] = [];
-  // chattingClients: UserModel[] = []
-  chatRoomList: Map<string, string> = new Map<string, string>()
+  // chatRoomList: Map<string, string> = new Map<string, string>()
+  chatRoomList: ChatRoom[] = []
   data = {};
   @WebSocketServer()
   server: Server;
   private logger: Logger = new Logger('EventsGateway');
+
+  waitingToJoin: string = null
 
   constructor(
     private chatService: ChatServiceServer
@@ -27,11 +29,11 @@ export class EventsGateway {
 
   handleConnection(client: Socket) {
     this.connectedClientList.push(client.id)
-    this.connectToStranger(client)
     this.logger.log(
       `Client connected: ${client.id} - ${this.connectedClientList.length} connected clients.`
     );
 
+    this.connectToStranger(client)
     /*Notify all the clients*/
     // this.server.emit(ActionTypes.ClientConnected, this.waitingRoomList);
 
@@ -43,22 +45,17 @@ export class EventsGateway {
     this.connectedClientList = this.connectedClientList.filter(
       connectedClient => connectedClient !== clientSock.id
     );
-    this.waitingRoomList = this.waitingRoomList.filter(
-      connectedClient => connectedClient.usrId !== clientSock.id
-    );
+
+    if(this.waitingToJoin == clientSock.id)
+      this.waitingToJoin  = null
+
+    this.leaveRoomAndNotify(clientSock)
+
     this.logger.log(
       `Client disconnected: ${clientSock.id} - ${this.connectedClientList.length} connected clients.`
     );
     // this.server.emit(ActionTypes.ClientConnected, this.waitingRoomList);
   }
-  //
-  // @SubscribeMessage(ActionTypes.PatchValue)
-  // patchValue(client: Socket, payload: Partial<FormData>) {
-  //   this.data = { ...this.data, ...payload };
-  //   this.logger.log(`Patch value: ${JSON.stringify(payload)}.`);
-  //   client.broadcast.emit(ActionTypes.ValuePatched, payload);
-  // }
-
 
   /*Connect to new stranger*/
   @SubscribeMessage(ActionTypes.reJoinRoom)
@@ -76,28 +73,29 @@ export class EventsGateway {
   connectToStranger(clientSock: Socket){
 
     /*If there is no users in waiting list*/
-    if(this.waitingRoomList.length < 1){
+    if(!this.waitingToJoin){
       /*add the current use to the waiting list*/
-      this.waitingRoomList.push(new UserModel(clientSock.id, UserStatus.waiting))
+      this.waitingToJoin = clientSock.id
+      // this.waitingRoomList.push(new UserModel(clientSock.id, UserStatus.waiting))
       this.logger.log('Server : Room init roomId : '+clientSock.id)
       return
     }else{
       /*If use already in waiting list*/
-      // let index = this.waitingRoomList.findIndex(value => value.usrId == clientSock.id)
-      // if(index == -1) return
+      if(this.waitingToJoin == clientSock.id) return;
       /*Get the first user from waiting list to create room*/
-      let newRoom = this.waitingRoomList[0].usrId
-      /*and Remove the uses from waiting list*/
-      this.waitingRoomList = this.waitingRoomList.filter((client)=>
-        client.usrId !== newRoom
-      )
+      let newRoomId = this.waitingToJoin
+      /*and Remove the user from waiting list*/
+       this.waitingToJoin = null
       /*Send requested client he has joined a group/client*/
-      clientSock.emit(ActionTypes.joined,newRoom)
+      clientSock.emit(ActionTypes.joined,newRoomId)
       /*Now notify the waiting list client the same*/
-      clientSock.to(newRoom).emit(ActionTypes.joined,newRoom)
+      clientSock.to(newRoomId).emit(ActionTypes.joined,newRoomId)
       /*Create room with waiting list client*/
-      this.logger.log('Server : Room joined roomId : '+newRoom)
-      clientSock.join(newRoom)
+      this.logger.log('Server : Room joined roomId : '+newRoomId)
+      /*Create new room and push with both the members in roomList*/
+      let newRoom = new ChatRoom(newRoomId,[newRoomId,clientSock.id])
+      this.chatRoomList.push(newRoom)
+      clientSock.join(newRoomId)
     }
   }
 
@@ -115,6 +113,8 @@ export class EventsGateway {
     try{
       this.logger.log(ActionTypes.leaveRoom + ' : '+roomId)
       client.leave(roomId);
+      /*Remove corresponding room*/
+      this.chatRoomList = this.chatRoomList.filter(room => room.roomId != roomId)
       client.to(roomId).emit(ActionTypes.userLeftRoom);
     }catch(e){
       this.logger.error(ActionTypes.leaveRoom + ' : '+roomId)
@@ -124,9 +124,26 @@ export class EventsGateway {
 
   @SubscribeMessage(ActionTypes.userIdle)
   usrIdl(clientSock: Socket){
+    this.logger.log(ActionTypes.userIdle + ' : '+clientSock.id)
     /*If use already in waiting list*/
-    let index = this.waitingRoomList.findIndex(value => value.usrId == clientSock.id)
-    if(index == -1) return;
+    if(this.waitingToJoin == clientSock.id)
+      this.waitingToJoin = null
+  }
+
+  private leaveRoomAndNotify(clientSock: Socket){
+    let roomToNotify: string = ''
+    this.chatRoomList = this.chatRoomList.filter(room => {
+      let isKeep = true
+      for(let userId of room.users){
+        if(userId == clientSock.id)
+          isKeep = false
+        else
+          roomToNotify = userId
+      }
+      return isKeep
+    })
+    if(roomToNotify)
+      clientSock.to(roomToNotify).emit(ActionTypes.userLeftRoom);
 
   }
 

@@ -12,6 +12,7 @@
       <p *ngSwitchCase='ClientStatus.chatting' class='chat-title'>You are connected to some stranger</p>
       <p *ngSwitchCase='ClientStatus.connect_error' class='text-red'>Couldn't connect to server</p>
       <p *ngSwitchCase='ClientStatus.disconnect' class='text-red'>disconnected</p>
+      <p *ngSwitchCase='ClientStatus.strangerLeft' class='text-red'>disconnected</p>
     </div>
 
 
@@ -37,7 +38,7 @@
 
   <div class='message-field'>
    <div class='bottom-nav'>
-     <button (click)='connectToStranger()' mat-raised-button color='primary'>{{clientStatus == ClientStatus.chatting?'Stop' : 'New'}}</button>
+     <button (click)='connectToStranger()' mat-raised-button color='primary'>{{clientStatus == ClientStatus.chatting || clientStatus == ClientStatus.waiting?'Stop' : 'New'}}</button>
      <textarea matInput [(ngModel)]='clientMsg' placeholder='Type your message here!'></textarea>
      <button (click)='sendMessage()' [disabled]='clientStatus != ClientStatus.chatting' color='accent' mat-raised-button><mat-icon>send</mat-icon></button>
    </div>
