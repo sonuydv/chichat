@@ -4,6 +4,9 @@ import { ChatServiceServer } from 'apps/api/src/app/service/chat-service.server'
 
 /**Chat events module*/
 @Module({
-  providers: [EventsGateway,ChatServiceServer]
+  providers: [
+    EventsGateway,
+    ChatServiceServer
+  ]
 })
 export class EventsModule {}

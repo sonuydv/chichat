@@ -6,5 +6,6 @@ export enum UserStatus{
   chatting,
   disconnect,
   connect_error,
-  connected
+  connected,
+  strangerLeft
 }

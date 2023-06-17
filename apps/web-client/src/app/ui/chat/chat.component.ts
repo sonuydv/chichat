@@ -32,6 +32,7 @@ export class ChatComponent implements OnInit,AfterViewInit, AfterViewChecked,OnD
 
   roomId: string = ''
 
+
   constructor(
     private chatService: ChatService,
     private fb: FormBuilder,
@@ -61,6 +62,7 @@ export class ChatComponent implements OnInit,AfterViewInit, AfterViewChecked,OnD
 
 
     this.chatService.on('connect',()=>{
+      this.chatMessages = []
       if(this.clientStatus == this.ClientStatus.connect_error ||
       this.clientStatus == this.ClientStatus.disconnect){
         this.clientStatus = this.ClientStatus.connected
@@ -69,6 +71,7 @@ export class ChatComponent implements OnInit,AfterViewInit, AfterViewChecked,OnD
 
 
     this.chatService.on(ActionTypes.joined, (roomId) => {
+      this.chatMessages = []
       console.log('group id : '+roomId);
 
       this.clientStatus = UserStatus.chatting
@@ -84,7 +87,7 @@ export class ChatComponent implements OnInit,AfterViewInit, AfterViewChecked,OnD
     })
 
     this.chatService.on(ActionTypes.userLeftRoom, ()=>{
-      this.clientStatus = UserStatus.idle
+      this.clientStatus = UserStatus.strangerLeft
     })
 
 
@@ -99,7 +102,6 @@ export class ChatComponent implements OnInit,AfterViewInit, AfterViewChecked,OnD
   }
 
   ngOnDestroy() {
-    this.chatService.leaveRoom(this.roomId)
     this.chatService.disconnect()
   }
 
@@ -120,6 +122,10 @@ export class ChatComponent implements OnInit,AfterViewInit, AfterViewChecked,OnD
         /*Stop the to idle status*/
         this.chatService.leaveRoom(this.roomId)
         this.clientStatus = UserStatus.idle
+        break;
+      default:
+        this.chatService.emit(ActionTypes.reJoinRoom)
+        this.clientStatus = UserStatus.waiting
         break;
 
     }
@@ -146,6 +152,14 @@ export class ChatComponent implements OnInit,AfterViewInit, AfterViewChecked,OnD
 export class ChatModel {
   constructor(
     public usrLabel: UserLabel,
+    public msg: string
+  ) {
+  }
+}
+
+export class MessageModel{
+  constructor(
+    public isError: boolean,
     public msg: string
   ) {
   }
